@@ -1,0 +1,4 @@
+intel-pin provides CMake targets:
+
+find_package(IntelPin CONFIG REQUIRED)
+target_link_libraries(main PRIVATE IntelPin::IntelPin)

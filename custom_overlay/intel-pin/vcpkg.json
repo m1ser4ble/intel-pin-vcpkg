@@ -1,0 +1,7 @@
+{
+  "name": "intel-pin",
+  "version": "3.31",
+  "homepage": "https://www.intel.com/content/www/us/en/developer/articles/tool/pin-a-dynamic-binary-instrumentation-tool.html",
+  "description": "Pin is a dynamic binary instrumentation framework for the the IA-32 and x86-64 instruction-set architectures that enables the creation of dynamic program analysis tools",
+  "license": null
+}
