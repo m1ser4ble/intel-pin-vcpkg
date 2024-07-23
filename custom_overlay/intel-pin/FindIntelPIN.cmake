@@ -39,8 +39,8 @@ if(IntelPIN_ROOT)
     target_link_libraries(IntelPIN INTERFACE
         pin
         xed
-        pinvm
-				pincrt
+				#pinvm
+				#pincrt
     )
 
   #if(CMAKE_SIZEOF_VOID_P EQUAL 8)
