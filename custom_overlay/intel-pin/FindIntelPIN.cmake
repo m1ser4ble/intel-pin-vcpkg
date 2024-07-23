@@ -7,6 +7,7 @@ if(IntelPIN_ROOT)
     # Automatically detect the subfolder in the zip
     #file(GLOB PIN_DIR LIST_DIRECTORIES true ${IntelPIN_SOURCE_DIR}/pin-*)
     set(PIN_DIR ${IntelPIN_ROOT}/src/intel-pin)
+		message("pindir : ${PIN_DIR}")
     # Loosely based on ${PIN_DIR}/source/tools/Config/makefile.win.config
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(PIN_EXE "${PIN_DIR}/intel64/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
@@ -17,24 +18,29 @@ if(IntelPIN_ROOT)
 
     add_library(IntelPIN INTERFACE)
 
-    target_include_directories(IntelPIN INTERFACE
+		target_include_directories(IntelPIN SYSTEM INTERFACE
+				${PIN_DIR}/extras/crt/include
+				${PIN_DIR}/extras/crt/include/kernel/uapi
+				${PIN_DIR}/extras/crt/include/kernel/uapi/asm-x86
+			)
+
+		target_include_directories(IntelPIN INTERFACE
         ${PIN_DIR}/source/include/pin
         ${PIN_DIR}/source/include/pin/gen
         ${PIN_DIR}/extras/components/include
         ${PIN_DIR}/extras/stlport/include
         ${PIN_DIR}/extras
+				${PIN_DIR}/extras/cxx/include
+				${PIN_DIR}/extras/crt/include/arch-x86_64
         ${PIN_DIR}/extras/libstdc++/include
-        ${PIN_DIR}/extras/crt/include
-        ${PIN_DIR}/extras/crt
-        ${PIN_DIR}/extras/crt/include/kernel/uapi
-        ${PIN_DIR}/extras/crt/include/kernel/uapi/asm-x86
+				${PIN_DIR}/extras/crt
     )
 
     target_link_libraries(IntelPIN INTERFACE
         pin
         xed
         pinvm
-        pincrt
+				pincrt
     )
 
   #if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -48,49 +54,51 @@ if(IntelPIN_ROOT)
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         target_include_directories(IntelPIN INTERFACE
             ${PIN_DIR}/extras/xed-intel64/include/xed
-            ${PIN_DIR}/extras/crt/include/arch-x86_64
+						#${PIN_DIR}/extras/crt/include/arch-x86_64
         )
         target_link_directories(IntelPIN INTERFACE
             ${PIN_DIR}/intel64/lib
             ${PIN_DIR}/intel64/lib-ext
-            ${PIN_DIR}/intel64/runtime/pincrt
+						#${PIN_DIR}/intel64/runtime/pincrt
             ${PIN_DIR}/extras/xed-intel64/lib
         )
-      #target_compile_definitions(IntelPIN INTERFACE
-      #      TARGET_IA32E
-      #      HOST_IA32E
+      target_compile_definitions(IntelPIN INTERFACE
+            TARGET_IA32E
+            HOST_IA32E
       #      TARGET_WINDOWS
-      #      __PIN__=1
-      #      PIN_CRT=1
-      #      __LP64__
+						TARGET_LINUX
+            __PIN__=1
+						PIN_CRT=1
+            __LP64__
       #      _WINDOWS_H_PATH_=../um # dirty hack
-      #  )
-        target_link_libraries(IntelPIN INTERFACE
+        )
+				#target_link_libraries(IntelPIN INTERFACE
           #ntdll-64
           #  kernel32
-            ${PIN_DIR}/intel64/runtime/pincrt/*
+					#     ${PIN_DIR}/intel64/runtime/pincrt/*
           #  ${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.obj
-        )
+					#)
     else()
         target_include_directories(IntelPIN INTERFACE
             ${PIN_DIR}/extras/xed-ia32/include/xed
-            ${PIN_DIR}/extras/crt/include/arch-x86
+						#${PIN_DIR}/extras/crt/include/arch-x86
         )
         target_link_directories(IntelPIN INTERFACE
             ${PIN_DIR}/ia32/lib
             ${PIN_DIR}/ia32/lib-ext
-            ${PIN_DIR}/ia32/runtime/pincrt
+						#${PIN_DIR}/ia32/runtime/pincrt
             ${PIN_DIR}/extras/xed-ia32/lib
         )
-      #target_compile_definitions(IntelPIN INTERFACE
-      #     TARGET_IA32
-      #     HOST_IA32
+      target_compile_definitions(IntelPIN INTERFACE
+           TARGET_IA32
+           HOST_IA32
       #     TARGET_WINDOWS
-      #     __PIN__=1
-      #     PIN_CRT=1
-      #     __i386__
+					 TARGET_LINUX
+           __PIN__=1
+           PIN_CRT=1
+           __i386__
       #     _WINDOWS_H_PATH_=../um # dirty hack
-      # )
+       )
         target_link_libraries(IntelPIN INTERFACE
           #     ntdll-32
           # kernel32
@@ -105,7 +113,7 @@ if(IntelPIN_ROOT)
         "${PIN_DIR}/source/tools/InstLib/*.H"
     )
     add_library(InstLib STATIC EXCLUDE_FROM_ALL ${InstLib_SOURCES})
-    target_include_directories(InstLib PUBLIC "${PIN_DIR}/source/tools/InstLib")
+		target_include_directories(InstLib PUBLIC "${PIN_DIR}/source/tools/InstLib")
     target_link_libraries(InstLib PUBLIC IntelPIN)
 
     function(add_pintool target)
