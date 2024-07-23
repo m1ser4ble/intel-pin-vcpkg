@@ -1,5 +1,15 @@
 find_path(IntelPIN_ROOT src/intel-pin)
 message("intel root : ${IntelPIN_ROOT}")
+
+set(TARGET_OS TARGET_${CMAKE_SYSTEM_NAME})
+message(STATUS "cmake_system_processor ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "cmake_host_system_processor ${CMAKE_HOST_SYSTEM_PROCESSOR}")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+	set(TARGET_ARCH TARGET_${CMAKE_SYSTEM_PROCESSOR})
+else()
+endif()
+set(HOST_ARCH HOST_${CMAKE_HOST_SYSTEM_PROCESSOR})
+
 #intel-pin/pin-external-3.31-98861-g71afcc22f-gcc-linux
 set(IntelPIN_FOUND FALSE)
 if(IntelPIN_ROOT)
@@ -59,7 +69,7 @@ if(IntelPIN_ROOT)
         target_link_directories(IntelPIN INTERFACE
             ${PIN_DIR}/intel64/lib
             ${PIN_DIR}/intel64/lib-ext
-						#${PIN_DIR}/intel64/runtime/pincrt
+						${PIN_DIR}/intel64/runtime/pincrt
             ${PIN_DIR}/extras/xed-intel64/lib
         )
       target_compile_definitions(IntelPIN INTERFACE
@@ -72,12 +82,21 @@ if(IntelPIN_ROOT)
             __LP64__
       #      _WINDOWS_H_PATH_=../um # dirty hack
         )
-				#target_link_libraries(IntelPIN INTERFACE
+				target_link_libraries(IntelPIN INTERFACE
+						c++abi
+						c-dynamic
+						c++
+						dl-dynamic
+						m-dynamic
+						unwind-dynamic
+						pindwarf 
+						dwarf 
+
           #ntdll-64
           #  kernel32
 					#     ${PIN_DIR}/intel64/runtime/pincrt/*
           #  ${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.obj
-					#)
+					)
     else()
         target_include_directories(IntelPIN INTERFACE
             ${PIN_DIR}/extras/xed-ia32/include/xed
@@ -102,7 +121,14 @@ if(IntelPIN_ROOT)
         target_link_libraries(IntelPIN INTERFACE
           #     ntdll-32
           # kernel32
-            ${PIN_DIR}/ia32/runtime/pincrt/*
+          	c++abi
+						c-dynamic
+						c++
+						dl-dynamic
+						m-dynamic
+						unwind-dynamic
+
+						#${PIN_DIR}/ia32/runtime/pincrt/*
           #  ${PIN_DIR}/ia32/runtime/pincrt/crtbeginS.obj
         )
     endif()
