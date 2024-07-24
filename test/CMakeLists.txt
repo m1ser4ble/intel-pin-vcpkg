@@ -14,6 +14,4 @@ set(CMAKE_CXX_STANDARD
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 
 message(STATUS "intelpin found : ${IntelPIN_FOUND}")
-#add_executable(profiler profiler.cpp)
 add_pintool(profiler profiler.cpp)
-#target_link_libraries(profiler IntelPIN)
