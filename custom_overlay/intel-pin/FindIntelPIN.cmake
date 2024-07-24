@@ -1,16 +1,32 @@
 find_path(IntelPIN_ROOT src/intel-pin)
 message("intel root : ${IntelPIN_ROOT}")
 
-set(TARGET_OS TARGET_${CMAKE_SYSTEM_NAME})
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	set(TARGET_OS TARGET_LINUX)
+endif()
+
 message(STATUS "cmake_system_processor ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "cmake_host_system_processor ${CMAKE_HOST_SYSTEM_PROCESSOR}")
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-	set(TARGET_ARCH TARGET_${CMAKE_SYSTEM_PROCESSOR})
+	set(TARGET_ARCH TARGET_IA32E)
+	set(INTEL_ARCH intel64)
+	set(ARCH x86_64)
+elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+	set(TARGET_ARCH TARGET_IA32)
+	set(INTEL_ARCH ia32)
+	set(ARCH x86)
 else()
+	message(FATAL_ERROR "currently, ${CMAKE_SYSTEM_PROCESSOR} is not supported architecture")
 endif()
-set(HOST_ARCH HOST_${CMAKE_HOST_SYSTEM_PROCESSOR})
 
-#intel-pin/pin-external-3.31-98861-g71afcc22f-gcc-linux
+if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "x86_64")
+	set(HOST_ARCH HOST_IA32E)
+elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "i386")
+	set(HOST_ARCH HOST_IA32)
+else()
+	message(FATAL_ERROR "currently, ${CMAKE_HOST_SYSTEM_PROCESSOR} is not supported host architecture")
+endif()
+
 set(IntelPIN_FOUND FALSE)
 if(IntelPIN_ROOT)
   set(IntelPIN_FOUND TRUE)
@@ -19,12 +35,9 @@ if(IntelPIN_ROOT)
     set(PIN_DIR ${IntelPIN_ROOT}/src/intel-pin)
 		message("pindir : ${PIN_DIR}")
     # Loosely based on ${PIN_DIR}/source/tools/Config/makefile.win.config
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(PIN_EXE "${PIN_DIR}/intel64/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
-    else()
-        set(PIN_EXE "${PIN_DIR}/ia32/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
-    endif()
-    string(REGEX REPLACE "/" "\\\\" PIN_EXE ${PIN_EXE})
+		set(PIN_EXE "${PIN_DIR}/${INTEL_ARCH}/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
+		
+		#string(REGEX REPLACE "/" "\\\\" PIN_EXE ${PIN_EXE})
 
     add_library(IntelPIN INTERFACE)
 
@@ -61,77 +74,43 @@ if(IntelPIN_ROOT)
 
     #target_compile_options(IntelPIN INTERFACE /GR- /GS- /EHs- /EHa- /fp:strict /Oi- /FIinclude/msvc_compat.h /wd5208)
 
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        target_include_directories(IntelPIN INTERFACE
-            ${PIN_DIR}/extras/xed-intel64/include/xed
-						#${PIN_DIR}/extras/crt/include/arch-x86_64
-        )
-        target_link_directories(IntelPIN INTERFACE
-            ${PIN_DIR}/intel64/lib
-            ${PIN_DIR}/intel64/lib-ext
-						${PIN_DIR}/intel64/runtime/pincrt
-            ${PIN_DIR}/extras/xed-intel64/lib
-        )
-      target_compile_definitions(IntelPIN INTERFACE
-            TARGET_IA32E
-            HOST_IA32E
-      #      TARGET_WINDOWS
-						TARGET_LINUX
-            __PIN__=1
-						PIN_CRT=1
-            __LP64__
-      #      _WINDOWS_H_PATH_=../um # dirty hack
-        )
-				target_link_libraries(IntelPIN INTERFACE
-						c++abi
-						c-dynamic
-						c++
-						dl-dynamic
-						m-dynamic
-						unwind-dynamic
-						pindwarf 
-						dwarf 
+			target_include_directories(IntelPIN INTERFACE
+				${PIN_DIR}/extras/xed-${INTEL_ARCH}/include/xed
+				${PIN_DIR}/extras/crt/include/arch-${ARCH}
+			)
+			target_link_directories(IntelPIN INTERFACE
+				${PIN_DIR}/${INTEL_ARCH}/lib
+					${PIN_DIR}/${INTEL_ARCH}/lib-ext
+					${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt
+					${PIN_DIR}/extras/xed-intel64/lib
+			)
+			set(LP_SIZE __LP64__)
+			message(STATUS "target arch ${TARGET_ARCH} host arch ${HOST_ARCH} target_os ${TARGET_OS}")
+		target_compile_definitions(IntelPIN INTERFACE
+			${TARGET_ARCH}
+			${HOST_ARCH}
+			${TARGET_OS}
+					__PIN__=1
+					PIN_CRT=1
+					${LP_SIZE}
+		#      _WINDOWS_H_PATH_=../um # dirty hack
+			)
+			target_link_libraries(IntelPIN INTERFACE
+					c++abi
+					c-dynamic
+					c++
+					dl-dynamic
+					m-dynamic
+					unwind-dynamic
+					pindwarf 
+					dwarf 
 
-          #ntdll-64
-          #  kernel32
-					#     ${PIN_DIR}/intel64/runtime/pincrt/*
-          #  ${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.obj
-					)
-    else()
-        target_include_directories(IntelPIN INTERFACE
-            ${PIN_DIR}/extras/xed-ia32/include/xed
-						#${PIN_DIR}/extras/crt/include/arch-x86
-        )
-        target_link_directories(IntelPIN INTERFACE
-            ${PIN_DIR}/ia32/lib
-            ${PIN_DIR}/ia32/lib-ext
-						#${PIN_DIR}/ia32/runtime/pincrt
-            ${PIN_DIR}/extras/xed-ia32/lib
-        )
-      target_compile_definitions(IntelPIN INTERFACE
-           TARGET_IA32
-           HOST_IA32
-      #     TARGET_WINDOWS
-					 TARGET_LINUX
-           __PIN__=1
-           PIN_CRT=1
-           __i386__
-      #     _WINDOWS_H_PATH_=../um # dirty hack
-       )
-        target_link_libraries(IntelPIN INTERFACE
-          #     ntdll-32
-          # kernel32
-          	c++abi
-						c-dynamic
-						c++
-						dl-dynamic
-						m-dynamic
-						unwind-dynamic
+				#ntdll-64
+				#  kernel32
+				#     ${PIN_DIR}/intel64/runtime/pincrt/*
+				#  ${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.obj
+				)
 
-						#${PIN_DIR}/ia32/runtime/pincrt/*
-          #  ${PIN_DIR}/ia32/runtime/pincrt/crtbeginS.obj
-        )
-    endif()
 
     # Create a static library InstLib that is used in a lot of example pintools
     file(GLOB InstLib_SOURCES
