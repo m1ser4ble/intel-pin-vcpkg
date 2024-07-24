@@ -24,8 +24,9 @@ elseif(VCPKG_TARGET_IS_LINUX)
   set(compress tar.gz)
   set(filename pin.${compress})
   set(magic_number 19138)
-  #set(sha b5f2f464675f0fd969dde2faf2e622b834eb1cc406c4a867148116f6c24ba5c709d98b678840f4a89a1778e12cde0ff70ce2ef59faee
-  #29c71af1)
+  set(sha 
+		5d502718a2d4e0fa438626a52f8d8ebe37357602489a7b1d76d99d2916ab6d797e21c703e6f24685c72482304415abd8673134058b75af6d374e89b91e9c098e)
+
   set(package_infix "lin")
 endif()
 
@@ -41,8 +42,7 @@ vcpkg_download_distfile(installer_path
     #URLS "https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-3.31-98861-g71afcc22f-gcc-linux.tar.gz"
     #URLS "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/${magic_number}/${filename}"
     FILENAME "pin-external-3.31-98861-g71afcc22f-${compiler}-${os}.${compress}"
-    SHA512 "5d502718a2d4e0fa438626a52f8d8ebe37357602489a7b1d76d99d2916ab6d797e21c703e6f24685c72482304415abd8673134058b75af6d374e89b91e9c098e"
-    #"${sha}"
+    SHA512 "${sha}"
 )
 
 set(extract_0_dir "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-extract")
@@ -66,8 +66,8 @@ else()
       )
     file(RENAME "${extract_0_dir}/pin-external-3.31-98861-g71afcc22f-gcc-linux" "${extract_0_dir}/intel-pin")
     set(pin_dir ${extract_0_dir}/intel-pin)
-    file(COPY "${pin_dir}/intel64/bin" DESTINATION "${CURRENT_PACKAGES_DIR}")
-    file(COPY "${pin_dir}/intel64/lib" DESTINATION "${CURRENT_PACKAGES_DIR}")
+		#file(COPY "${pin_dir}/intel64/bin" DESTINATION "${CURRENT_PACKAGES_DIR}")
+		#file(COPY "${pin_dir}/intel64/lib" DESTINATION "${CURRENT_PACKAGES_DIR}")
     #file(COPY "${pin_dir}/intel64/runtime/pincrt" DESTINATION "${CURRENT_PACKAGES_DIR}/lib")
     file(COPY "${pin_dir}" DESTINATION "${CURRENT_PACKAGES_DIR}/src")
     #file(COPY "${pin_dir}/extras" DESTINATION "${CURRENT_PACKAGES_DIR}/pintool/extras")
@@ -78,5 +78,10 @@ endif()
 
 #file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 
-#file(INSTALL "${SOURCE_PATH}/LICENSE" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}" RENAME copyright)
+file(INSTALL 
+	"${CMAKE_CURRENT_LIST_DIR}/copyright"
+	DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
+file(INSTALL 
+	"${CMAKE_CURRENT_LIST_DIR}/IntelPINConfig.cmake" 
+	DESTINATION "${CURRENT_PACKAGES_DIR}/share/intelpin")
 configure_file("${CMAKE_CURRENT_LIST_DIR}/usage" "${CURRENT_PACKAGES_DIR}/share/${PORT}/usage" COPYONLY)

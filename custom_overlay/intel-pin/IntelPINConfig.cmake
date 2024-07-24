@@ -2,6 +2,11 @@ find_path(IntelPIN_ROOT src/intel-pin)
 message("intel root : ${IntelPIN_ROOT}")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	message(STATUS "cmake compiler id ${CMAKE_CXX_COMPILER_ID}")
+	if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		message(FATAL_ERROR "IntelPIN only supports gcc/g++ in linux")
+		
+	endif()
 	set(TARGET_OS TARGET_LINUX)
 endif()
 
