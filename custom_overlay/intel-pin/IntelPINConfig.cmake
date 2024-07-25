@@ -70,13 +70,17 @@ if(IntelPIN_ROOT)
 				#pinvm
 				#pincrt
     )
-
+		target_compile_options(IntelPIN INTERFACE   -Wl,--hash-style=sysv  -nostdlib  -funwind-tables  -fasynchronous-unwind-tables -fno-stack-protector -fno-exceptions  -fabi-version=2 -faligned-new     )
+		target_link_options(IntelPIN INTERFACE  -Wl,--hash-style=sysv   -nostdlib -fabi-version=2 -faligned-new   )
+		# below go to library private
+		target_link_options(IntelPIN INTERFACE -Wl,-Bsymbolic -Wl,--version-script=${PIN_DIR}/source/include/pin/pintool.ver  -fabi-version=2 )
+		#target_link_options(${target} PRIVATE -nostdlib)
+		set_target_properties(IntelPIN PROPERTIES  POSITION_INDEPENDENT_CODE ON)
   #if(CMAKE_SIZEOF_VOID_P EQUAL 8)
   #target_link_options(IntelPIN INTERFACE /NODEFAULTLIB /EXPORT:main /BASE:0xC5000000 /ENTRY:Ptrace_DllMainCRTStartup /IGNORE:4210 /IGNORE:4281)
   # else()
   #     target_link_options(IntelPIN INTERFACE /NODEFAULTLIB /EXPORT:main /BASE:0x55000000 /ENTRY:Ptrace_DllMainCRTStartup@12 /IGNORE:4210 /IGNORE:4281 /SAFESEH:NO)
   # endif()
-
     #target_compile_options(IntelPIN INTERFACE /GR- /GS- /EHs- /EHa- /fp:strict /Oi- /FIinclude/msvc_compat.h /wd5208)
 
 			target_include_directories(IntelPIN INTERFACE
@@ -113,7 +117,8 @@ if(IntelPIN_ROOT)
 				#ntdll-64
 				#  kernel32
 				#     ${PIN_DIR}/intel64/runtime/pincrt/*
-				#  ${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.obj
+				${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.o 
+				 ${PIN_DIR}/intel64/runtime/pincrt/crtendS.o
 				)
 
 

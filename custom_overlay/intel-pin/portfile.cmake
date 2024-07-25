@@ -78,6 +78,8 @@ endif()
 
 #file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
 
+file(INSTALL "${pin_dir}/source/include/pin" DESTINATION "${CURRENT_PACKAGES_DIR}/include/pin")
+
 file(INSTALL 
 	"${CMAKE_CURRENT_LIST_DIR}/copyright"
 	DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
