@@ -36,7 +36,11 @@ count_call(ADDRINT ip, ADDRINT target)
 	call_count++;
 }
 void print_usage(){
-	std::cout<<"test"<<std::endl;
+  std::string help = KNOB_BASE::StringKnobSummary();
+
+  fprintf(stderr, "\nProfile call and jump targets\n");
+  fprintf(stderr, "%s\n", help.c_str());
+
 }
 
 static void 
@@ -109,6 +113,46 @@ log_syscall(THREADID tid, CONTEXT* ctxt, SYSCALL_STANDARD std, VOID *v)
 }
 
 void print_results(int , void*){
+ADDRINT ip, target;
+  unsigned long count;
+  std::map<ADDRINT, std::map<ADDRINT, unsigned long> >::iterator i;
+  std::map<ADDRINT, unsigned long>::iterator j;
+
+  printf("executed %lu instructions\n\n", insn_count);
+
+  printf("******* CONTROL TRANSFERS *******\n");
+  for(i = cflows.begin(); i != cflows.end(); i++) {
+    target = i->first;
+    for(j = i->second.begin(); j != i->second.end(); j++) {
+      ip = j->first;
+      count = j->second;
+      printf("0x%08jx <- 0x%08jx: %3lu (%0.2f%%)\n", 
+             target, ip, count, (double)count/cflow_count*100.0);
+    } 
+  }
+
+  if(!calls.empty()) {
+    printf("\n******* FUNCTION CALLS *******\n");
+    for(i = calls.begin(); i != calls.end(); i++) {
+      target = i->first;
+
+      for(j = i->second.begin(); j != i->second.end(); j++) {
+        ip = j->first;
+        count = j->second;
+        printf("[%-30s] 0x%08jx <- 0x%08jx: %3lu (%0.2f%%)\n", 
+               funcnames[target].c_str(), target, ip, count, (double)count/call_count*100.0);
+      } 
+    }
+  }
+
+  if(!syscalls.empty()) {
+    printf("\n******* SYSCALLS *******\n");
+    for(j = syscalls.begin(); j != syscalls.end(); j++) {
+      count = j->second;
+      printf("%3ju: %3lu (%0.2f%%)\n", j->first, count, (double)count/syscall_count*100.0);
+    }
+  }
+
 }
 
 int

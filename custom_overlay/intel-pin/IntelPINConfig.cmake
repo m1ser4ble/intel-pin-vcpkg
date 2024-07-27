@@ -117,8 +117,8 @@ if(IntelPIN_ROOT)
 				#ntdll-64
 				#  kernel32
 				#     ${PIN_DIR}/intel64/runtime/pincrt/*
-				${PIN_DIR}/intel64/runtime/pincrt/crtbeginS.o 
-				 ${PIN_DIR}/intel64/runtime/pincrt/crtendS.o
+				${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtbeginS.o 
+				${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtendS.o
 				)
 
 
