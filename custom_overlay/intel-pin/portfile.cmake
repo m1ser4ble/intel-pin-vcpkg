@@ -8,8 +8,7 @@ elseif(VCPKG_TARGET_IS_WINDOWS)
   set(compiler msvc)
   set(os windows)
   set(compress zip)
-	#set(sha a3eb6b75241a2eccb73ed73035ff111172c55d3fa51f545c7542277a155df84ff72fc826621711153e683f84058e64cb549c030968f9a8a3ed46)
-  set(package_infix "win")
+	set(sha 3e704e83d861f093e48b78a45a21e9e10889436a417a39c5dff67709d92dabd6f624bdcb7eb10756ff2385437978a463c0d50f84c90ffac8957366d5efea0658)
 
 elseif(VCPKG_TARGET_IS_OSX)
   set(compiler clang)
@@ -24,7 +23,6 @@ elseif(VCPKG_TARGET_IS_LINUX)
   set(sha 
 		5d502718a2d4e0fa438626a52f8d8ebe37357602489a7b1d76d99d2916ab6d797e21c703e6f24685c72482304415abd8673134058b75af6d374e89b91e9c098e)
 
-  set(package_infix "lin")
 endif()
 
 #if(NOT sha)
