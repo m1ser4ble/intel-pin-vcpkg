@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.22)
 
 project(mypin  LANGUAGES CXX)
 
-#include(../custom_overlay/intel-pin/FindIntelPIN.cmake)
 find_package(IntelPIN CONFIG REQUIRED)
 
 set(CMAKE_BUILD_TYPE Release)
