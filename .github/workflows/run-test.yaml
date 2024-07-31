@@ -51,6 +51,9 @@ jobs:
           #buildPresetAdditionalArgs: "['--config Release']"
           #testPreset: ninja-multi-vcpkg
           #testPresetAdditionalArgs: "['--config Release']"
+        env:
+          HTTP_PROXY: ""
+          HTTPS_PROXY: ""
       - name: find pin and pintool
         run: |
           find . -name "pin*"
