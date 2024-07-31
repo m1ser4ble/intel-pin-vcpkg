@@ -41,6 +41,8 @@ jobs:
       - name: enter into test project
         run: |
           cd test
+      - name: Reset any existing proxy settings
+        run: netsh winhttp reset proxy
       - name: Run CMake consuming CMakePreset.json and run vcpkg to build packages
         uses: lukka/run-cmake@v10
         with:
@@ -51,9 +53,6 @@ jobs:
           #buildPresetAdditionalArgs: "['--config Release']"
           #testPreset: ninja-multi-vcpkg
           #testPresetAdditionalArgs: "['--config Release']"
-        env:
-          HTTP_PROXY: ""
-          HTTPS_PROXY: ""
       - name: find pin and pintool
         run: |
           find . -name "pin*"
