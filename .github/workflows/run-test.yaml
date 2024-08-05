@@ -25,6 +25,9 @@ jobs:
           #buildPresetAdditionalArgs: "['--config Release']"
           #testPreset: ninja-multi-vcpkg
           #testPresetAdditionalArgs: "['--config Release']"
+        env:
+          CC: gcc
+          CXX: g++
       - name: find pin and pintool
         run: |
           find . -name "pin"
