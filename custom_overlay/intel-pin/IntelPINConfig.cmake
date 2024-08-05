@@ -111,7 +111,6 @@ if(IntelPIN_ROOT)
       pindwarf
       dwarf
       ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtbeginS${CMAKE_CXX_OUTPUT_EXTENSION}
-      ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtendS${CMAKE_CXX_OUTPUT_EXTENSION}
   )
 
   # target specific configuration
@@ -133,6 +132,11 @@ if(IntelPIN_ROOT)
       IntelPIN INTERFACE -Wl,-Bsymbolic
       -Wl,--version-script=${PIN_DIR}/source/include/pin/pintool.ver
       -fabi-version=2)
+    target_link_libraries(
+      IntelPIN
+      INTERFACE
+        ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtendS${CMAKE_CXX_OUTPUT_EXTENSION}
+    )
     # target_link_options(${target} PRIVATE -nostdlib)
   elseif(TARGET_OS STREQUAL "TARGET_WINDOWS")
 
