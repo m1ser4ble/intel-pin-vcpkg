@@ -58,8 +58,8 @@ jobs:
           #testPresetAdditionalArgs: "['--config Release']"
       - name: find pin and pintool
         run: |
-          find . -name "pin*"
-          find . -name "*profiler*"
+          Get-ChildItem -Recurse -Filter "pin*"
+          Get-ChildItem -Recurse -Filter "profiler*"
     #macos-build-and-test: # there is no free intel macos machine supported by github
     #  runs-on: macos-latest-large
     #  steps:
