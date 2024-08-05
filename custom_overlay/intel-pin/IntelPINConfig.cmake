@@ -5,9 +5,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 	message(STATUS "cmake compiler id ${CMAKE_CXX_COMPILER_ID}")
 	if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 		message(FATAL_ERROR "IntelPIN only supports gcc/g++ in linux")
-		
 	endif()
 	set(TARGET_OS TARGET_LINUX)
+
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	set(TARGET_OS TARGET_WINDOWS)
+else()
+	message(FATAL_ERROR "can't find ${CMAKE_SYSTEM_NAME} in supported system list")
 endif()
 
 message(STATUS "cmake_system_processor ${CMAKE_SYSTEM_PROCESSOR}")
