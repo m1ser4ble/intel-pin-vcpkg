@@ -82,8 +82,6 @@ if(IntelPIN_ROOT)
               ${PIN_DIR}/extras/libstdc++/include
               ${PIN_DIR}/extras/crt)
 
-  target_link_libraries(IntelPIN INTERFACE pin xed)
-
   set_target_properties(IntelPIN PROPERTIES POSITION_INDEPENDENT_CODE ON)
   target_include_directories(
     IntelPIN INTERFACE ${PIN_DIR}/extras/xed-${INTEL_ARCH}/include/xed
@@ -102,14 +100,8 @@ if(IntelPIN_ROOT)
   target_link_libraries(
     IntelPIN
     INTERFACE
-      c++abi
-      c-dynamic
-      c++
-      dl-dynamic
-      m-dynamic
-      unwind-dynamic
-      pindwarf
-      dwarf
+      pin
+      xed
       ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtbeginS${CMAKE_CXX_OUTPUT_EXTENSION}
   )
 
@@ -135,13 +127,21 @@ if(IntelPIN_ROOT)
     target_link_libraries(
       IntelPIN
       INTERFACE
+        c++
+        c++abi
+        c-dynamic
+        dl-dynamic
+        m-dynamic
+        unwind-dynamic
+        pindwarf
+        dwarf
         ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt/crtendS${CMAKE_CXX_OUTPUT_EXTENSION}
     )
     # target_link_options(${target} PRIVATE -nostdlib)
   elseif(TARGET_OS STREQUAL "TARGET_WINDOWS")
 
     target_link_libraries(IntelPIN INTERFACE # pinvm
-                                             pincrt pinipc ntdll-64 kernel32)
+                                             pincrt pinipc kernel32)
     target_link_options(
       IntelPIN
       INTERFACE
@@ -168,7 +168,7 @@ if(IntelPIN_ROOT)
       IntelPIN INTERFACE PIN_CRT=1 ${LP_SIZE} # _WINDOWS_H_PATH_=../um # dirty
                                               # hack
     )
-
+    # if host system is linux target_link_libraries(IntelPIN INTERFACE c++)
   endif()
 
   # Create a static library InstLib that is used in a lot of example pintools
