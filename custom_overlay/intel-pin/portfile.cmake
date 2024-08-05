@@ -19,12 +19,12 @@ elseif(VCPKG_TARGET_IS_LINUX)
   set(compiler gcc)
   set(os linux)
   set(compress tar.gz)
-  set(filename pin.${compress})
   set(sha 
 		5d502718a2d4e0fa438626a52f8d8ebe37357602489a7b1d76d99d2916ab6d797e21c703e6f24685c72482304415abd8673134058b75af6d374e89b91e9c098e)
 
 endif()
 
+set(filename "pin-external-3.31-98861-g71afcc22f-${compiler}-${os}.${compress}")
 #if(NOT sha)
 #  message(WARNING "${PORT} is empty for ${TARGET_TRIPLET}.")
 #  return()
@@ -33,10 +33,10 @@ endif()
 vcpkg_download_distfile(installer_path
 #"https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-3.31-98861-g71afcc22f-msvc-windows.zip"
 #"https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-3.31-98861-g71afcc22f-clang-windows.zip"
-    URLS "https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-3.31-98861-g71afcc22f-${compiler}-${os}.${compress}"
+    URLS "https://software.intel.com/sites/landingpage/pintool/downloads/${filename}"
     #URLS "https://software.intel.com/sites/landingpage/pintool/downloads/pin-external-3.31-98861-g71afcc22f-gcc-linux.tar.gz"
     #URLS "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/${magic_number}/${filename}"
-    FILENAME "pin-external-3.31-98861-g71afcc22f-${compiler}-${os}.${compress}"
+    FILENAME "${filename}"
 		SHA512 "${sha}"
 )
 
@@ -46,7 +46,6 @@ file(MAKE_DIRECTORY "${extract_0_dir}")
 
 if(VCPKG_TARGET_IS_WINDOWS)
     vcpkg_find_acquire_program(7Z)
-    message(STATUS "Extracting offline installer")
     vcpkg_execute_required_process(
         COMMAND "${7Z}" x "${installer_path}" "-o${extract_0_dir}" "-y" "-bso0" "-bsp0"
         WORKING_DIRECTORY "${extract_0_dir}"
@@ -59,19 +58,14 @@ else()
           WORKING_DIRECTORY "${extract_0_dir}"
           LOGNAME "extract-${TARGET_TRIPLET}-0"
       )
-    file(RENAME "${extract_0_dir}/pin-external-3.31-98861-g71afcc22f-${compiler}-${os}" "${extract_0_dir}/intel-pin")
-    set(pin_dir ${extract_0_dir}/intel-pin)
-		#file(COPY "${pin_dir}/intel64/bin" DESTINATION "${CURRENT_PACKAGES_DIR}")
-		#file(COPY "${pin_dir}/intel64/lib" DESTINATION "${CURRENT_PACKAGES_DIR}")
-    #file(COPY "${pin_dir}/intel64/runtime/pincrt" DESTINATION "${CURRENT_PACKAGES_DIR}/lib")
-    file(COPY "${pin_dir}" DESTINATION "${CURRENT_PACKAGES_DIR}/src")
-    #file(COPY "${pin_dir}/extras" DESTINATION "${CURRENT_PACKAGES_DIR}/pintool/extras")
-    #file(RENAME "${extract_0_dir}/l_onemkl_p_2023.0.0.25398_offline/packages" "${extract_0_dir}/packages")
+
   elseif(VCPKG_TARGET_IS_OSX)
   endif()
 endif()
 
-#file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
+file(RENAME "${extract_0_dir}/pin-external-3.31-98861-g71afcc22f-${compiler}-${os}" "${extract_0_dir}/intel-pin")
+set(pin_dir ${extract_0_dir}/intel-pin)
+file(COPY "${pin_dir}" DESTINATION "${CURRENT_PACKAGES_DIR}/src")
 
 file(INSTALL "${pin_dir}/source/include/pin" DESTINATION "${CURRENT_PACKAGES_DIR}/include/pin")
 
