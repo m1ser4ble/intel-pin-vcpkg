@@ -3,15 +3,15 @@ message("intel root : ${IntelPIN_ROOT}")
 
 message(STATUS "cmake_system_processor ${CMAKE_SYSTEM_PROCESSOR}")
 message(STATUS "cmake_host_system_processor ${CMAKE_HOST_SYSTEM_PROCESSOR}")
-if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL
-                                               "AMD64")
-  set(TARGET_ARCH TARGET_IA32E)
-  set(INTEL_ARCH intel64)
-  set(ARCH x86_64)
-elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
+message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "i386" OR CMAKE_CXX_FLAGS MATCHES "-m32")
   set(TARGET_ARCH TARGET_IA32)
   set(INTEL_ARCH ia32)
   set(ARCH x86)
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64|AMD64)")
+  set(TARGET_ARCH TARGET_IA32E)
+  set(INTEL_ARCH intel64)
+  set(ARCH x86_64)
 else()
   message(
     FATAL_ERROR
@@ -89,7 +89,7 @@ if(IntelPIN_ROOT)
   target_link_directories(
     IntelPIN INTERFACE ${PIN_DIR}/${INTEL_ARCH}/lib
     ${PIN_DIR}/${INTEL_ARCH}/lib-ext ${PIN_DIR}/${INTEL_ARCH}/runtime/pincrt
-    ${PIN_DIR}/extras/xed-intel64/lib)
+    ${PIN_DIR}/extras/xed-${INTEL_ARCH}/lib)
   message(
     STATUS
       "target arch ${TARGET_ARCH} host arch ${HOST_ARCH} target_os ${TARGET_OS}"
