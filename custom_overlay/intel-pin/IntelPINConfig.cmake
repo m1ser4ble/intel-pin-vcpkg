@@ -7,14 +7,12 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL
                                                "AMD64")
   set(TARGET_ARCH TARGET_IA32E)
   set(FUND_TC_TARGETCPU FUND_CPU_INTEL64)
-  set(FUND_TC_HOSTCPU FUND_CPU_INTEL64)
   set(INTEL_ARCH intel64)
   set(ARCH x86_64)
 elseif(CMAKE_SYSTEM_PROCESSOR STREQUAL "i386")
   set(TARGET_ARCH TARGET_IA32)
   set(INTEL_ARCH ia32)
   set(FUND_TC_TARGETCPU FUND_CPU_IA32)
-  set(FUND_TC_HOSTCPU FUND_CPU_IA32)
   set(ARCH x86)
 else()
   message(
@@ -25,8 +23,10 @@ endif()
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL
                                                "AMD64")
   set(HOST_ARCH HOST_IA32E)
+  set(FUND_TC_HOSTCPU FUND_CPU_INTEL64)
 elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "i386")
   set(HOST_ARCH HOST_IA32)
+  set(FUND_TC_HOSTCPU FUND_CPU_IA32)
 else()
   message(
     FATAL_ERROR
@@ -64,11 +64,9 @@ if(IntelPIN_ROOT)
   # Automatically detect the subfolder in the zip file(GLOB PIN_DIR
   # LIST_DIRECTORIES true ${IntelPIN_SOURCE_DIR}/pin-*)
   set(PIN_DIR ${IntelPIN_ROOT}/src/intel-pin)
-  message("pindir : ${PIN_DIR}")
-  # Loosely based on ${PIN_DIR}/source/tools/Config/makefile.win.config
-  set(PIN_EXE "${PIN_DIR}/${INTEL_ARCH}/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
+  message(STATUS "pindir : ${PIN_DIR}")
 
-  # string(REGEX REPLACE "/" "\\\\" PIN_EXE ${PIN_EXE})
+  set(PIN_EXE "${PIN_DIR}/${INTEL_ARCH}/bin/pin${CMAKE_EXECUTABLE_SUFFIX}")
 
   add_library(IntelPIN_TOOLS INTERFACE)
   add_library(IntelPIN_APP INTERFACE)
@@ -92,7 +90,8 @@ if(IntelPIN_ROOT)
               ${PIN_DIR}/extras/crt)
 
   set_target_properties(IntelPIN_TOOLS PROPERTIES POSITION_INDEPENDENT_CODE ON)
-  set_target_properties(IntelPIN_APP PROPERTIES POSITION_INDEPENDENT_CODE FALSE)
+  set_target_properties(IntelPIN_APP PROPERTIES POSITION_INDEPENDENT_CODE OFF)
+
   target_include_directories(IntelPIN_APP INTERFACE ${PIN_DIR}/Utils)
   target_include_directories(
     IntelPIN_TOOLS INTERFACE ${PIN_DIR}/extras/xed-${INTEL_ARCH}/include/xed
@@ -140,13 +139,13 @@ if(IntelPIN_ROOT)
     target_link_options(IntelPIN_TOOLS INTERFACE -Wl,--hash-style=sysv
                         -nostdlib -fabi-version=2 -faligned-new)
     # below go to library private
+    target_link_options(IntelPIN_APP INTERFACE -Wl,--as-needed)
+    target_link_libraries(IntelPIN_APP INTERFACE m dl pthread)
+
     target_link_options(
       IntelPIN_TOOLS INTERFACE -Wl,-Bsymbolic
       -Wl,--version-script=${PIN_DIR}/source/include/pin/pintool.ver
       -fabi-version=2)
-
-    target_link_options(IntelPIN_APP INTERFACE -Wl,--as-needed)
-    target_link_libraries(IntelPIN_APP INTERFACE m dl pthread)
 
     target_link_libraries(
       IntelPIN_TOOLS
