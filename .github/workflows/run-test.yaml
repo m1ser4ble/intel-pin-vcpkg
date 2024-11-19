@@ -66,6 +66,9 @@ jobs:
         run: |
           Get-ChildItem -Recurse -Filter "pin*"
           Get-ChildItem -Recurse -Filter "profiler*"
+      - name: run profiler on cl
+        run: |
+          .\vcpkg_installed\x64-windows\src\intel-pin\pin.exe -t .\profiler.dll -c -s -- cl
     #macos-build-and-test: # there is no free intel macos machine supported by github
     #  runs-on: macos-latest-large
     #  steps:
